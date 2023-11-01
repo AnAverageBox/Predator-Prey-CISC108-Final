@@ -29,9 +29,24 @@ Put an X into the [ ] boxes for each milestone you believe you have finished.
 [ ] Evolution
 '''
 from designer import *
-from bakery import assert_equal
-from dataclasses import dataclass
-from designer import *
-from bakery import assert_equal
+from random import randint
 from dataclasses import dataclass
 
+@dataclass
+class World:
+    sheep: list[DesignerObject]
+    wolfs: list[DesignerObject]
+    
+def create_world() -> World:
+    """Creates the World"""
+    return World(create_sheep(), create_wolf())
+
+def create_sheep() -> DesignerObject:
+    """Creates sheep"""
+    sheep = emoji('🐑')
+
+def create_wolf() -> designerObject:
+    """Creates wolfs"""
+    wolf = emoji('🐺')
+    
+start()
