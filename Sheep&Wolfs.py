@@ -38,6 +38,7 @@ class World:
     wolfs: list[DesignerObject]
     sheep_pop: int
     wolf_pop: int
+    timer: int
     
 def create_world() -> World:
     """Creates the World"""
@@ -46,9 +47,22 @@ def create_world() -> World:
 def create_sheep() -> DesignerObject:
     """Creates sheep"""
     sheep = emoji('🐑')
+    
+    
+def grow_sheep_population():
+    """increases the sheeps population
+    make a coutner that when the sheep_pop increases by 50 (including the amount that may be subtracted), it adds another
+    sheep object on screen and the counter resets to 0 and repeats the process"""
+    
+    world.sheep_pop += 1
 
 def create_wolf() -> designerObject:
     """Creates wolfs"""
     wolf = emoji('🐺')
-    
+
+
+when('starting', create_world())
+when('updating', )
+
 start()
+
