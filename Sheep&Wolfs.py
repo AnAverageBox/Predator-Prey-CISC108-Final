@@ -42,7 +42,7 @@ class World:
     
 def create_world() -> World:
     """Creates the World"""
-    return World(create_sheep(), create_wolf(), 1, 1)
+    return World(create_sheep(), create_wolf(), 1, 1, 0)
 
 def create_sheep() -> DesignerObject:
     """Creates sheep"""
@@ -56,13 +56,13 @@ def grow_sheep_population():
     
     world.sheep_pop += 1
 
-def create_wolf() -> designerObject:
+def create_wolf() -> DesignerObject:
     """Creates wolfs"""
     wolf = emoji('🐺')
 
 
-when('starting', create_world())
-when('updating', )
+when('starting', create_world)
+when('updating', grow_sheep_population)
 
 start()
 
