@@ -36,10 +36,12 @@ from dataclasses import dataclass
 class World:
     sheep: list[DesignerObject]
     wolfs: list[DesignerObject]
+    sheep_pop: int
+    wolf_pop: int
     
 def create_world() -> World:
     """Creates the World"""
-    return World(create_sheep(), create_wolf())
+    return World(create_sheep(), create_wolf(), 1, 1)
 
 def create_sheep() -> DesignerObject:
     """Creates sheep"""
