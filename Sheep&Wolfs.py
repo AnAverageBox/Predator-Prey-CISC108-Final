@@ -51,6 +51,7 @@ def create_sheep() -> DesignerObject:
     sheep.scale_y = 1
     sheep.x = rand_int(0, get_width())
     sheep.y = rand_int(0, get_heigth())
+    return sheep
     
     
 def grow_sheep_population():
@@ -67,6 +68,7 @@ def create_wolf() -> DesignerObject:
     wolf.scale_x = 1
     wolf.x = rand_int(0, get_width())
     wolf.y = rand_int(0, get_height())
+    return wolf
 
 when('starting', create_world)
 when('updating', grow_sheep_population)
