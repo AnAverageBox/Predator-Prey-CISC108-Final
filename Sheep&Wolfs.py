@@ -36,13 +36,14 @@ from dataclasses import dataclass
 class World:
     sheep: list[DesignerObject]
     wolfs: list[DesignerObject]
-    sheep_pop: int
-    wolf_pop: int
-    timer: int
+    sheep_population: int
+    wolf_population: int
+    wolf_timer: int #for creating wolves
+    sheep_timer: int #for creating sheep
     
 def create_world() -> World:
     """Creates the World"""
-    return World(create_sheep(), create_wolf(), 1, 1, 0)
+    return World([], [], 1, 1, 0, 0)
 
 def create_sheep() -> DesignerObject:
     """Creates sheep"""
@@ -52,6 +53,10 @@ def create_sheep() -> DesignerObject:
     sheep.x = rand_int(0, get_width())
     sheep.y = rand_int(0, get_heigth())
     return sheep
+
+def make_sheep(world: World):
+    """Creates sheep on a random part of the screen when conditions are met,
+    uses create_sheep() function"""
     
     
 def grow_sheep_population():
@@ -59,10 +64,10 @@ def grow_sheep_population():
     make a coutner that when the sheep_pop increases by 50 (including the amount that may be subtracted), it adds another
     sheep object on screen and the counter resets to 0 and repeats the process"""
     
-    world.sheep_pop += 1
+    world.sheep_population += 1
 
 def create_wolf() -> DesignerObject:
-    """Creates wolfs"""
+    """Creates wolfs at a random part of the screen"""
     wolf = emoji('🐺')
     wolf.scale_x = 1
     wolf.scale_x = 1
@@ -70,8 +75,12 @@ def create_wolf() -> DesignerObject:
     wolf.y = rand_int(0, get_height())
     return wolf
 
+def make_wolves(world: World):
+    """Creates wolf if conditions are met, calls create_wolf() function"""
+    
+
+
 when('starting', create_world)
 when('updating', grow_sheep_population)
 
 start()
-
