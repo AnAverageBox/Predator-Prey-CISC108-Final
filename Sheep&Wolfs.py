@@ -35,7 +35,7 @@ from dataclasses import dataclass
 @dataclass
 class World:
     sheep: list[DesignerObject]
-    wolfs: list[DesignerObject]
+    wolves: list[DesignerObject]
     sheep_population: int
     wolf_population: int
     wolf_timer: int #for creating wolves
@@ -58,17 +58,17 @@ def create_sheep() -> DesignerObject:
     sheep.y = randint(0, get_height())
     return sheep
 
-def new_sheep_location() -> list[int]:
+def new_sheep_location(current_location: list[int]) -> list[int]:
     """generates a new coordinate that a sheep will move to"""
-    left_right = randint(0, 1)
-    up_down = randint(0, 1)
+    left_right = randint(0, 1)#0 is left, 1 is right
+    up_down = randint(0, 1)# 0 is down, 1 is up
     move_x = rand_int(0, 30)
     move_y = rand_int(0, 30)
     if left_right == 0:
         move_x = -move_x
-    if up_down == 0:
-        move_y = -move_y
-    return [move_x, move_y]
+    if up_down == 1:
+        move_y = -move_y #y getting smaller actually is higher up on the screen
+    return [current_location + move_x, current_location + move_y]
 
 def move_sheep(world: World):
     pass
@@ -98,19 +98,19 @@ def create_wolf() -> DesignerObject:
 
 def new_wolf_location(current_location: list[int]) -> list[int]:
     """generates a new coordinate that a wolf will move to"""
-    left_right = randint(0, 1)
-    up_down = randint(0, 1)
+    left_right = randint(0, 1) #0 for left 1 for right
+    up_down = randint(0, 1)#0 for down 1 for up
     move_x = rand_int(0, 40)
     move_y = rand_int(0, 40)
     if left_right == 0:
         move_x = -move_x
-    if up_down == 0:
-        move_y = -move_y
+    if up_down == 1:
+        move_y = -move_y #y getting smaller actually is higher up on the screen
     return [current_location[0] + move_x, current_location[1] + move_y]
 
-def move_wolf(world: World, current_wolf: DesignerObject):
+def move_wolf(world: World):
     """will move the wolf to the new coordinate"""
-    new_coordinate = new_wolf_location(current_wolf)
+    pass
 
 def make_wolves(world: World):
     """Creates wolf if conditions are met, calls create_wolf() function"""
