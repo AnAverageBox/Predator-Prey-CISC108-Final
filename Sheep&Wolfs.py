@@ -58,6 +58,21 @@ def create_sheep() -> DesignerObject:
     sheep.y = randint(0, get_height())
     return sheep
 
+def new_sheep_location() -> list[int]:
+    """generates a new coordinate that a sheep will move to"""
+    left_right = randint(0, 1)
+    up_down = randint(0, 1)
+    move_x = rand_int(0, 30)
+    move_y = rand_int(0, 30)
+    if left_right == 0:
+        move_x = -move_x
+    if up_down == 0:
+        move_y = -move_y
+    return [move_x, move_y]
+
+def move_sheep(world: World):
+    pass
+
 def make_sheep(world: World):
     """Creates sheep on a random part of the screen when conditions are met,
     uses create_sheep() function"""
@@ -65,7 +80,6 @@ def make_sheep(world: World):
         #every 50 updates another sheep will spawn on screen
         world.sheep.append(create_sheep())
         world.sheep_timer = 0
-    
     
 def grow_sheep_population(world: World):
     """increases the sheeps population make a counter that when the sheep_pop increases
@@ -81,6 +95,22 @@ def create_wolf() -> DesignerObject:
     wolf.x = randint(0, get_width())
     wolf.y = randint(0, get_height())
     return wolf
+
+def new_wolf_location(current_location: list[int]) -> list[int]:
+    """generates a new coordinate that a wolf will move to"""
+    left_right = randint(0, 1)
+    up_down = randint(0, 1)
+    move_x = rand_int(0, 40)
+    move_y = rand_int(0, 40)
+    if left_right == 0:
+        move_x = -move_x
+    if up_down == 0:
+        move_y = -move_y
+    return [current_location[0] + move_x, current_location[1] + move_y]
+
+def move_wolf(world: World, current_wolf: DesignerObject):
+    """will move the wolf to the new coordinate"""
+    new_coordinate = new_wolf_location(current_wolf)
 
 def make_wolves(world: World):
     """Creates wolf if conditions are met, calls create_wolf() function"""
