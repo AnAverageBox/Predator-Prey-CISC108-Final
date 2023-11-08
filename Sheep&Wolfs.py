@@ -4,8 +4,8 @@ Put an X into the [ ] boxes for each milestone you believe you have finished.
 
 ## Simulator Features
 # Milestone 1
-[ ] Sheep exist
-[ ] Wolves exist
+[X] Sheep exist
+[X] Wolves exist
 [ ] Animals move
 [ ] Animals live
 [ ] Animals die
@@ -46,8 +46,8 @@ def create_world() -> World:
     return World([create_sheep()], [create_wolf()], 1, 1, 0, 0)
 
 def increase_timers(world: World):
-    world.wolf_timer += 1
-    world.sheep_timer += 1
+    world.wolf_timer = world.wolf_timer + 1
+    world.sheep_timer = world.sheep_timer + 1
 
 def create_sheep() -> DesignerObject:
     """Creates sheep"""
@@ -61,16 +61,16 @@ def create_sheep() -> DesignerObject:
 def make_sheep(world: World):
     """Creates sheep on a random part of the screen when conditions are met,
     uses create_sheep() function"""
-    if world.sheep_timer // 1000 == 0:
+    if world.sheep_timer / 50 >= 1:
+        #every 50 updates another sheep will spawn on screen
         world.sheep.append(create_sheep())
-        world.wolf_timer
+        world.sheep_timer = 0
     
     
 def grow_sheep_population(world: World):
     """increases the sheeps population make a counter that when the sheep_pop increases
     by 50(including the amount that may be subtracted), it adds anothersheep object on
     screen and the counter resets to 0 and repeats the process"""
-    
     world.sheep_population += 1
 
 def create_wolf() -> DesignerObject:
@@ -84,7 +84,8 @@ def create_wolf() -> DesignerObject:
 
 def make_wolves(world: World):
     """Creates wolf if conditions are met, calls create_wolf() function"""
-    if world.wolf_timer // 10000 == 0:
+    if world.wolf_timer / 150 >= 1:
+        #every 150 updates a new wolf spawns on screen
         world.wolfs.append(create_wolf())
         world.wolf_timer = 0
 
@@ -92,6 +93,7 @@ def grow_wolf_population(world: World):
     """increases the wolf population make a counter that when the sheep_pop increases
     by 50 (including the amount that may be subtracted), it adds another sheep object
     on screen and the counter resets to 0 and repeats the process"""
+    world.wolf_population += 1
 
 when('starting', create_world)
 when('updating', grow_sheep_population)
