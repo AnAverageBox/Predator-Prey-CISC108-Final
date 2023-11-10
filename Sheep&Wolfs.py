@@ -6,8 +6,8 @@ Put an X into the [ ] boxes for each milestone you believe you have finished.
 # Milestone 1
 [X] Sheep exist
 [X] Wolves exist
-[ ] Animals move
-[ ] Animals live
+[X] Animals move
+[X] Animals live
 [ ] Animals die
 # Milestone 2
 [ ] Smooth movement
@@ -32,6 +32,10 @@ from designer import *
 from random import randint
 from dataclasses import dataclass
 
+WOLF_SPEED = 2
+SHEEP_SPEED = 1
+
+
 @dataclass
 class Sheep:
     emoji: DesignerObject
@@ -54,6 +58,7 @@ class World:
     wolf_population: int
     wolf_timer: int #for creating wolves
     sheep_timer: int #for creating sheep
+    world_timer: int #universal timer for both animals
     
 def create_world() -> World:
     """Creates the World"""
@@ -62,16 +67,22 @@ def create_world() -> World:
 def increase_timers(world: World):
     world.wolf_timer = world.wolf_timer + 1
     world.sheep_timer = world.sheep_timer + 1
+    world.world_timer += 1
 
 def create_sheep() -> Sheep:
     """Creates sheep"""
     sheep_x = randint(0, get_width()-20)
     sheep_y = randint(0, get_height()-20)
     
-    sheep = Sheep(emoji('🐑', sheep_x, sheep_y), 0, 0, True)
+    new_location = new_animal_location(sheep_x, sheep_y)
+    new_x = new_location[0]
+    new_y = new_location[1]
+    
+    sheep = Sheep(emoji('🐑', sheep_x, sheep_y), new_x, new_y, True)
     return sheep
 
 def move_sheep(world: World):
+    """will move sheep to the new location"""
     for shep in world.sheep:
         #singular and plural for sheep are the same
         direction_x = 1
@@ -83,9 +94,16 @@ def move_sheep(world: World):
             direction_y = -1
             
         if shep.emoji.x != shep.new_x:
-            shep.emoji.x += 1 * direction_x
+            shep.emoji.x += SHEEP_SPEED * direction_x
         if shep.emoji.y != shep.new_y:
-            shep.emoji.y += 1 * direction_y
+            shep.emoji.y += SHEEP_SPEED * direction_y
+            
+        make_new_location = shep.emoji.x == shep.new_x and shep.emoji.y == shep.new_y
+        #once sheep's current location matches the new location, it makes another new one
+        if make_new_location:
+            new_location = new_animal_location(shep.emoji.x, shep.emoji.y)
+            shep.new_x = new_location[0]
+            shep.new_y = new_location[1]
 
 def make_sheep(world: World):
     """Creates sheep on a random part of the screen when conditions are met,
@@ -105,10 +123,15 @@ def create_wolf() -> Wolf:
     """Creates wolfs at a random part of the screen"""
     wolf_x = randint(0, get_width()-20)
     wolf_y = randint(0, get_height()-20)
-    wolf = Wolf(emoji('🐺', wolf_x, wolf_y), 0, 0, True)
+    
+    new_location = new_animal_location(wolf_x, wolf_y)
+    new_x = new_location[0]
+    new_y = new_location[1]
+
+    wolf = Wolf(emoji('🐺', wolf_x, wolf_y), new_x, new_y, True)
     return wolf
 
-def move_wolf(world: World):
+def move_wolves(world: World):
     """will move the wolf to the new coordinate"""
     for wolf in world.wolves:
         direction_x = 1
@@ -119,12 +142,22 @@ def move_wolf(world: World):
         if wolf.emoji.y > wolf.new_y:
             direction_y = -1
             
-        if wolf.emoji.x != wolf.new_x:
-            wolf.emoji.x += 1 * direction_x
-        if wolf.emoji.y != wolf.new_y:
-            wolf.emoji.y += 1 * direction_y
+        if abs(abs(wolf.emoji.x) - abs(wolf.new_x)) > 1:
+            #if the new x coordinate current x coordinate or within 1 unit
+            #of each other, it stops moving the wolf (this prevents wolf from vibrating)
+            wolf.emoji.x += WOLF_SPEED * direction_x
+        if abs(abs(wolf.emoji.y) - abs(wolf.new_y)) > 1:
+            wolf.emoji.y += WOLF_SPEED * direction_y
+            
+        make_new_location = abs(abs(wolf.emoji.x) - abs(wolf.new_x)) <= 1 and abs(abs(wolf.emoji.y) - abs(wolf.new_y)) <= 1
+        #once wolf's current location matches the new location, it makes another new one
+        if make_new_location:
+            new_location = new_animal_location(wolf.emoji.x, wolf.emoji.y)
+            wolf.new_x = new_location[0]
+            wolf.new_y = new_location[1]
+            
 
-def make_wolves(world: World):
+def make_wolf(world: World):
     """Creates wolf if conditions are met, calls create_wolf() function"""
     if world.wolf_timer / 150 >= 1:
         #every 150 updates a new wolf spawns on screen
@@ -137,22 +170,42 @@ def grow_wolf_population(world: World):
     on screen and the counter resets to 0 and repeats the process"""
     world.wolf_population += 1
     
-def new_animal_location(animal: DesignerObject) -> list[int]:
-    """generates a new coordinate that a the animal will move to"""
+def new_animal_location(x: int, y: int) -> list[int]:
+    """takes coordinate x and y, and return new coordinate that is
+    within 200 units of said coordinates
+    
+    Ex:
+    (300,300) -> (500, 100)
+    """
     left_right = randint(0, 1)#0 is left, 1 is right
     up_down = randint(0, 1)# 0 is down, 1 is up
-    move_x = randint(0, 30)
-    move_y = randint(0, 30)
+    move_x = randint(0, 200)
+    move_y = randint(0, 200)
     if left_right == 0:
         move_x = -move_x
     if up_down == 1:
         move_y = -move_y #y getting smaller actually is higher up on the screen
-    return [animal.emoji.x + move_x, animal.emoji.y + move_y]
+        
+    #prevents going off screen
+    new_x = x + move_x
+    new_y = y + move_y
+    if new_x < 0:
+        new_x = 0
+    elif new_x > get_width():
+        new_x = get_width()
+    
+    if new_y < 0:
+        new_y = 0
+    elif new_y > get_height():
+        new_y = get_height()
+    return [new_x, new_y]
 
 when('starting', create_world)
 when('updating', grow_sheep_population)
 when('updating', increase_timers)
-when('updating', make_wolves)
+when('updating', make_wolf)
 when('updating', make_sheep)
+when('updating', move_wolves)
+when('updating', move_sheep)
 
 start()
