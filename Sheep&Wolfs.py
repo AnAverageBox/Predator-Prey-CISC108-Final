@@ -8,7 +8,7 @@ Put an X into the [ ] boxes for each milestone you believe you have finished.
 [X] Wolves exist
 [X] Animals move
 [X] Animals live
-[ ] Animals die
+[X] Animals die
 # Milestone 2
 [ ] Smooth movement
 [ ] Wolves eat
@@ -68,6 +68,7 @@ def increase_timers(world: World):
     world.wolf_timer = world.wolf_timer + 1
     world.sheep_timer = world.sheep_timer + 1
     world.world_timer += 1
+    print(world.world_timer)
 
 def create_sheep() -> Sheep:
     """Creates sheep"""
@@ -201,7 +202,13 @@ def new_animal_location(x: int, y: int) -> list[int]:
     return [new_x, new_y]
 
 def animals_die(world: World):
-    pass
+    """each sheep and wolf dies after a certain amount of time"""
+    if world.world_timer % 500 == 0:
+        destroy(world.wolves[0].emoji)
+        del world.wolves[0]#deletes oldest wolf in list of wolves
+    if world.world_timer % 350 == 0:
+        destroy(world.sheep[0].emoji)
+        del world.sheep[0]#deletes oldest sheep in list of wolves
     
 
 when('starting', create_world)
@@ -211,5 +218,6 @@ when('updating', make_wolf)
 when('updating', make_sheep)
 when('updating', move_wolves)
 when('updating', move_sheep)
+when('updating', animals_die)
 
 start()
