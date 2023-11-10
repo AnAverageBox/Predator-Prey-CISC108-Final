@@ -68,7 +68,6 @@ def increase_timers(world: World):
     world.wolf_timer = world.wolf_timer + 1
     world.sheep_timer = world.sheep_timer + 1
     world.world_timer += 1
-    print(world.world_timer)
 
 def create_sheep() -> Sheep:
     """Creates sheep"""
