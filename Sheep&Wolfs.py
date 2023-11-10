@@ -62,7 +62,7 @@ class World:
     
 def create_world() -> World:
     """Creates the World"""
-    return World([create_sheep()], [create_wolf()], 1, 1, 0, 0)
+    return World([create_sheep()], [create_wolf()], 1, 1, 0, 0, 0)
 
 def increase_timers(world: World):
     world.wolf_timer = world.wolf_timer + 1
@@ -108,7 +108,7 @@ def move_sheep(world: World):
 def make_sheep(world: World):
     """Creates sheep on a random part of the screen when conditions are met,
     uses create_sheep() function"""
-    if world.sheep_timer / 50 >= 1:
+    if world.sheep_timer / 100 >= 1:
         #every 50 updates another sheep will spawn on screen
         world.sheep.append(create_sheep())
         world.sheep_timer = 0
@@ -159,7 +159,7 @@ def move_wolves(world: World):
 
 def make_wolf(world: World):
     """Creates wolf if conditions are met, calls create_wolf() function"""
-    if world.wolf_timer / 150 >= 1:
+    if world.wolf_timer / 300 >= 1:
         #every 150 updates a new wolf spawns on screen
         world.wolves.append(create_wolf())
         world.wolf_timer = 0
@@ -199,6 +199,10 @@ def new_animal_location(x: int, y: int) -> list[int]:
     elif new_y > get_height():
         new_y = get_height()
     return [new_x, new_y]
+
+def animals_die(world: World):
+    pass
+    
 
 when('starting', create_world)
 when('updating', grow_sheep_population)
