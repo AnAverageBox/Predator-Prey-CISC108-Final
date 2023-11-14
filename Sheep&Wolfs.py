@@ -12,7 +12,7 @@ Put an X into the [ ] boxes for each milestone you believe you have finished.
 [X] Animals live
 [X] Animals die
 # Milestone 2
-[ ] Smooth movement
+[X] Smooth movement
 [ ] Wolves eat
 [ ] Animals reproduce
 # Milestone 3
