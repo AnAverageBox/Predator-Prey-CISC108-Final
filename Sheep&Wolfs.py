@@ -144,7 +144,7 @@ def move_wolves(world: World):
         if wolf.emoji.y > wolf.new_y:
             direction_y = -1
             
-        if abs(abs(wolf.emoji.x) - abs(wolf.new_x)) > 1:
+        if abs(abs(wolf.emoji.x) - abs(wolf.new_x)) > 1: #REPLACE SOME OF THIS WITH HELPER FUNCTION
             #if the new x coordinate current x coordinate or within 1 unit
             #of each other, it stops moving the wolf (this prevents wolf from vibrating)
             wolf.emoji.x += WOLF_SPEED * direction_x
@@ -189,6 +189,7 @@ def new_animal_location(x: int, y: int) -> list[int]:
         move_y = -move_y #y getting smaller actually is higher up on the screen
         
     #prevents going off screen
+    #REPLACE SOME OF THIS WITH HELPER FUNCTION
     new_x = x + move_x
     new_y = y + move_y
     if new_x < 0:
@@ -203,7 +204,7 @@ def new_animal_location(x: int, y: int) -> list[int]:
     return [new_x, new_y]
 
 def animals_die(world: World):
-    """each sheep and wolf dies after a certain amount of time"""
+    """each sheep and wolf dies after a certain amount of time (likely to get changed after adding population)"""
     if world.world_timer % 500 == 0:
         destroy(world.wolves[0].emoji)
         del world.wolves[0]#deletes oldest wolf in list of wolves
