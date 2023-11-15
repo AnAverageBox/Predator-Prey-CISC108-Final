@@ -144,20 +144,28 @@ def move_wolves(world: World):
         if wolf.emoji.y > wolf.new_y:
             direction_y = -1
             
-        if abs(abs(wolf.emoji.x) - abs(wolf.new_x)) > 1: #REPLACE SOME OF THIS WITH HELPER FUNCTION
-            #if the new x coordinate current x coordinate or within 1 unit
-            #of each other, it stops moving the wolf (this prevents wolf from vibrating)
+        x_close_enough = close_enough_to(wolf.emoji.x, wolf.new_x)
+        y_close_enough = close_enough_to(wolf.emoji.y, wolf.new_y)
+        if not x_close_enough: 
             wolf.emoji.x += WOLF_SPEED * direction_x
-        if abs(abs(wolf.emoji.y) - abs(wolf.new_y)) > 1:
+        
+        if not y_close_enough:
             wolf.emoji.y += WOLF_SPEED * direction_y
+        
             
-        make_new_location = abs(abs(wolf.emoji.x) - abs(wolf.new_x)) <= 1 and abs(abs(wolf.emoji.y) - abs(wolf.new_y)) <= 1
-        #once wolf's current location matches the new location, it makes another new one
-        if make_new_location:
+        if x_close_enough and y_close_enough:
+            #new location on screen is assigned
             new_location = new_animal_location(wolf.emoji.x, wolf.emoji.y)
             wolf.new_x = new_location[0]
             wolf.new_y = new_location[1]
             
+def close_enough_to(current_value: int, new_value) -> bool:
+    """returns whether value (usually x or y coordinate) is close enough to new 
+    location/coordinates as a boolean (in this case if it's within 1 unit/pixel)"""
+    if abs(abs(current_value) - abs(new_value)) <= 1:
+        return True
+    else:
+        return False
 
 def make_wolf(world: World):
     """Creates wolf if conditions are met, calls create_wolf() function"""
@@ -189,7 +197,7 @@ def new_animal_location(x: int, y: int) -> list[int]:
         move_y = -move_y #y getting smaller actually is higher up on the screen
         
     #prevents going off screen
-    #REPLACE SOME OF THIS WITH HELPER FUNCTION
+    #REPLACE SOME OF THIS WITH HELPER FUNCTION-------------------------------------------
     new_x = x + move_x
     new_y = y + move_y
     if new_x < 0:
