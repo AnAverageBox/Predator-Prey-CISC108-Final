@@ -58,15 +58,19 @@ class World:
     wolves: list[Wolf]
     sheep_population: float #WILL BE MADE INTO INTEGER WHEN ON SCREEN
     wolf_population: float #WILL BE MADE INTO INTEGER WHEN ON SCREEN
-    wolf_timer: int #for creating wolves
-    sheep_timer: int #for creating sheep
+    sheep_timer: int #for creating wolves
+    wolf_timer: int #for creating sheep
     world_timer: int #universal timer for both animals
+    sheep_population_counter: DesignerObject
+    wolf_population_counter: DesignerObject
     
 def create_world() -> World:
     """Creates the World"""
     return World(sheep = [create_sheep()], wolves = [create_wolf()],
                  sheep_population = 1000, wolf_population = 500,
-                 wolf_timer = 0, sheep_timer = 0, world_timer = 0)
+                 wolf_timer = 0, sheep_timer = 0, world_timer = 0,
+                 wolf_population_counter = text("black", 'Wolf population: ' + str(int(wolf_population)), 25),
+                 sheep_population_counter = text("black", 'Sheep population: ' + str(int(sheep_population)), 25))
     #using the other way to make dataclass instance
 
 def increase_timers(world: World):
@@ -138,7 +142,7 @@ def create_wolf() -> Wolf:
     return wolf
 
 def move_wolves(world: World):
-    """will move the wolf to the new coordinate"""
+    """will move the wolves to the new locations"""
     for wolf in world.wolves:
         direction_x = 1
         direction_y = 1
@@ -231,11 +235,20 @@ def animals_reproduce(world: World):
     current_wolf_population = world.wolf_population
     current_sheep_population = world.sheep_population
     
-    wolves_born = wolf_population * 0.001#one tenth of a percent
-    sheep_born = sheep_population * 0.002#two tenths of a percent
+    wolves_born = current_wolf_population * 0.002#two tenth of a percent
+    sheep_born = current_sheep_population * 0.001#one tenth of a percent
     
     world.wolf_population = wolves_born + current_wolf_population
     world.sheep_population = sheep_born + current_sheep_population
+    
+    
+    
+    
+def simulation_over(world: World):
+    if world.wolf_population <= 0:
+        pass
+    if world.sheep_population <= 0:
+        pass
     
 
 when('starting', create_world)
