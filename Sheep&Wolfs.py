@@ -14,7 +14,7 @@ Put an X into the [ ] boxes for each milestone you believe you have finished.
 # Milestone 2
 [X] Smooth movement
 [ ] Wolves eat
-[ ] Animals reproduce
+[X] Animals reproduce
 # Milestone 3
 [ ] Grass exists
 [ ] Grass lives
@@ -56,17 +56,21 @@ class Wolf:
 class World:
     sheep: list[Sheep]
     wolves: list[Wolf]
-    sheep_population: int
-    wolf_population: int
+    sheep_population: float #WILL BE MADE INTO INTEGER WHEN ON SCREEN
+    wolf_population: float #WILL BE MADE INTO INTEGER WHEN ON SCREEN
     wolf_timer: int #for creating wolves
     sheep_timer: int #for creating sheep
     world_timer: int #universal timer for both animals
     
 def create_world() -> World:
     """Creates the World"""
-    return World([create_sheep()], [create_wolf()], 1, 1, 0, 0, 0)
+    return World(sheep = [create_sheep()], wolves = [create_wolf()],
+                 sheep_population = 1000, wolf_population = 500,
+                 wolf_timer = 0, sheep_timer = 0, world_timer = 0)
+    #using the other way to make dataclass instance
 
 def increase_timers(world: World):
+    """increases timers in the world dataclass"""
     world.wolf_timer = world.wolf_timer + 1
     world.sheep_timer = world.sheep_timer + 1
     world.world_timer += 1
@@ -101,7 +105,7 @@ def move_sheep(world: World):
             shep.emoji.y += SHEEP_SPEED * direction_y
             
         make_new_location = shep.emoji.x == shep.new_x and shep.emoji.y == shep.new_y
-        #once sheep's current location matches the new location, it makes another new one
+        #once sheep's current location matches the new location, it makes gives it another one
         if make_new_location:
             new_location = new_animal_location(shep.emoji.x, shep.emoji.y)
             shep.new_x = new_location[0]
@@ -152,7 +156,6 @@ def move_wolves(world: World):
         if not y_close_enough:
             wolf.emoji.y += WOLF_SPEED * direction_y
         
-            
         if x_close_enough and y_close_enough:
             #new location on screen is assigned
             new_location = new_animal_location(wolf.emoji.x, wolf.emoji.y)
@@ -197,7 +200,6 @@ def new_animal_location(x: int, y: int) -> list[int]:
         move_y = -move_y #y getting smaller actually is higher up on the screen
         
     #prevents going off screen
-    #REPLACE SOME OF THIS WITH HELPER FUNCTION-------------------------------------------
     new_x = x + move_x
     new_y = y + move_y
     if new_x < 0:
@@ -219,6 +221,21 @@ def animals_die(world: World):
     if world.world_timer % 350 == 0:
         destroy(world.sheep[0].emoji)
         del world.sheep[0]#deletes oldest sheep in list of wolves
+        
+def animals_reproduce(world: World):
+    """animals' populations goes up and down, dependeing on the number of
+    emojis that exist on screen"""
+    num_of_wolves = len(world.wolves)#can be done with for loop
+    num_of_sheep = len(world.sheep)#can be done with for loop
+    
+    current_wolf_population = world.wolf_population
+    current_sheep_population = world.sheep_population
+    
+    wolves_born = wolf_population * 0.001#one tenth of a percent
+    sheep_born = sheep_population * 0.002#two tenths of a percent
+    
+    world.wolf_population = wolves_born + current_wolf_population
+    world.sheep_population = sheep_born + current_sheep_population
     
 
 when('starting', create_world)
@@ -229,5 +246,7 @@ when('updating', make_sheep)
 when('updating', move_wolves)
 when('updating', move_sheep)
 when('updating', animals_die)
+when('updating', animals_reproduce)
 
 start()
+
