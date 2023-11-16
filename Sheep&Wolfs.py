@@ -1,6 +1,7 @@
 '''
 link to milestone 1 demo: https://drive.google.com/file/d/1iQFsoh4K1TU5lLgh_2xIyjmcAowIe2Jl/view?usp=sharing
 
+link to milestone 2 demo:
 Instructions: copy the text below into a comment at the top of your Python file.
 Put an X into the [ ] boxes for each milestone you believe you have finished.
 
@@ -13,7 +14,7 @@ Put an X into the [ ] boxes for each milestone you believe you have finished.
 [X] Animals die
 # Milestone 2
 [X] Smooth movement
-[ ] Wolves eat
+[X] Wolves eat
 [X] Animals reproduce
 # Milestone 3
 [ ] Grass exists
@@ -51,6 +52,8 @@ class Wolf:
     new_x: int
     new_y: int
     alive: bool
+#Note for grader, I only used del because Wolf and Sheep were separate
+#dataclasses from a DesignerObject, I was running into some bugs when I didn't
 
 @dataclass
 class World:
@@ -66,11 +69,11 @@ class World:
     
 def create_world() -> World:
     """Creates the World"""
-    return World(sheep = [create_sheep()], wolves = [create_wolf()],
-                 sheep_population = 1000, wolf_population = 500,
-                 wolf_timer = 0, sheep_timer = 0, world_timer = 0,
-                 wolf_population_counter = text("black", 'Wolf population: ' + str(int(wolf_population)), 25),
-                 sheep_population_counter = text("black", 'Sheep population: ' + str(int(sheep_population)), 25))
+    return World([create_sheep()],[create_wolf()],
+                 1000, 500,
+                 0, 0, 0,
+                 text("black", 'Wolf population: ' + str(500), 25, 200, 130),
+                 text("black", 'Sheep population: ' + str(1000), 25, 200, 170))
     #using the other way to make dataclass instance
 
 def increase_timers(world: World):
@@ -122,12 +125,6 @@ def make_sheep(world: World):
         #every 50 updates another sheep will spawn on screen
         world.sheep.append(create_sheep())
         world.sheep_timer = 0
-    
-def grow_sheep_population(world: World):
-    """increases the sheeps population make a counter that when the sheep_pop increases
-    by 50(including the amount that may be subtracted), it adds anothersheep object on
-    screen and the counter resets to 0 and repeats the process"""
-    world.sheep_population += 1
 
 def create_wolf() -> Wolf:
     """Creates wolfs at a random part of the screen"""
@@ -180,12 +177,6 @@ def make_wolf(world: World):
         #every 150 updates a new wolf spawns on screen
         world.wolves.append(create_wolf())
         world.wolf_timer = 0
-
-def grow_wolf_population(world: World):
-    """increases the wolf population make a counter that when the sheep_pop increases
-    by 50 (including the amount that may be subtracted), it adds another sheep object
-    on screen and the counter resets to 0 and repeats the process"""
-    world.wolf_population += 1
     
 def new_animal_location(x: int, y: int) -> list[int]:
     """takes coordinate x and y, and return new coordinate that is
@@ -235,16 +226,47 @@ def animals_reproduce(world: World):
     current_wolf_population = world.wolf_population
     current_sheep_population = world.sheep_population
     
-    wolves_born = current_wolf_population * 0.002#two tenth of a percent
-    sheep_born = current_sheep_population * 0.001#one tenth of a percent
-    
-    world.wolf_population = wolves_born + current_wolf_population
+    sheep_born = current_sheep_population * 0.0005
     world.sheep_population = sheep_born + current_sheep_population
+    #five hundredths of a percent
+    
+    wolves_born = current_wolf_population * 0.0003
+    world.wolf_population = wolves_born + current_wolf_population
+    #three hundreths of a percent per update
+    
+def update_population_text(world:World):
+    """Updates the population text on screen to be match the population"""
+    updated_sheep_text = 'Sheep population: ' + str(int(world.sheep_population))
+    world.sheep_population_counter.text = updated_sheep_text
+    
+    updated_wolf_text = 'Wolf population: ' + str(int(world.wolf_population))
+    world.wolf_population_counter.text = updated_wolf_text   
     
     
     
+def wolf_eats_sheep(world:World):
+    destroyed_sheep = []
+    for wolf in world.wolves:
+        for shep in world.sheep:
+            if colliding(wolf.emoji, shep.emoji):
+                destroyed_sheep.append(shep)
+                
+    if len(destroyed_sheep) > 0:
+        world.sheep_population -= 150
+        world.wolf_population += 100
+    world.sheep = filter_from_sheep(world.sheep, destroyed_sheep)
+            
+def filter_from_sheep(old_list: list[Sheep], elements_to_not_keep: list[Sheep]) -> list[Sheep]:
+    sheep_left = []
+    for sheep in old_list:
+        if sheep in elements_to_not_keep:
+            destroy(sheep.emoji)
+            del sheep
+        else:
+            sheep_left.append(sheep)
+    return sheep_left
     
-def simulation_over(world: World):
+def simulation_over(world: World): #THIS WILL BE THE LAST FUNCTION
     if world.wolf_population <= 0:
         pass
     if world.sheep_population <= 0:
@@ -252,7 +274,6 @@ def simulation_over(world: World):
     
 
 when('starting', create_world)
-when('updating', grow_sheep_population)
 when('updating', increase_timers)
 when('updating', make_wolf)
 when('updating', make_sheep)
@@ -260,6 +281,8 @@ when('updating', move_wolves)
 when('updating', move_sheep)
 when('updating', animals_die)
 when('updating', animals_reproduce)
+when('updating', update_population_text)
+when('updating', wolf_eats_sheep)
+#there's a bug here, if you put 'updatin' it doesn't give an error
 
 start()
-
