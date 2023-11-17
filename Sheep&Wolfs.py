@@ -1,7 +1,7 @@
 '''
 link to milestone 1 demo: https://drive.google.com/file/d/1iQFsoh4K1TU5lLgh_2xIyjmcAowIe2Jl/view?usp=sharing
 
-link to milestone 2 demo:
+link to milestone 2 demo: https://drive.google.com/file/d/1iQFsoh4K1TU5lLgh_2xIyjmcAowIe2Jl/view?usp=sharing
 
 Instructions: copy the text below into a comment at the top of your Python file.
 Put an X into the [ ] boxes for each milestone you believe you have finished.
