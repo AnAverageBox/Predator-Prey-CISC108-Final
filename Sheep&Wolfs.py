@@ -75,6 +75,8 @@ class World:
     sheep_population_spawn: float #population can affect on-screen animals
     wolf_population_spawn: float
     
+    grass_squares: list[DesignerObject]#the grass on screen
+    
     
 def create_world() -> World:
     """Creates the World"""
