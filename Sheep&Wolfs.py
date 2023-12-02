@@ -18,7 +18,7 @@ Put an X into the [ ] boxes for each milestone you believe you have finished.
 [X] Wolves eat
 [X] Animals reproduce
 # Milestone 3
-[ ] Grass exists
+[X] Grass exists
 [ ] Grass lives
 [ ] Sheep eat
 [ ] Grass grows
