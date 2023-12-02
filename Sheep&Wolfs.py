@@ -59,6 +59,8 @@ class Wolf:
 
 @dataclass
 class World:
+    grass_squares: list[DesignerObject]#the grass on screen
+    
     sheep: list[Sheep]
     wolves: list[Wolf]
     
@@ -76,18 +78,17 @@ class World:
     sheep_population_spawn: float #population can affect on-screen animals
     wolf_population_spawn: float
     
-    grass_squares: list[DesignerObject]#the grass on screen
     
     
 def create_world() -> World:
     """Creates the World"""
-    return World([create_sheep()],[create_wolf()],
+    return World([rectangle('green',100 ,100, 200, 200)],
+                [create_sheep()],[create_wolf()],
                  1000, 500,
                  0, 0, 0,
                  text("black", 'Wolf population: ' + str(500), 25, 200, 130),
                  text("black", 'Sheep population: ' + str(1000), 25, 200, 170),
-                 1000,500,
-                 [rectangle('green',100 ,100, 0, 0)])
+                 1000,500,)
     #using the other way to make dataclass instance
 
 def increase_timers(world: World):
