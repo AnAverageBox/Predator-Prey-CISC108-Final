@@ -39,6 +39,7 @@ from dataclasses import dataclass
 WOLF_SPEED = 2
 SHEEP_SPEED = 1
 
+GRASS_RECTANGLES = [rectangle('green',0 ,0)]
 
 @dataclass
 class Sheep:
@@ -85,7 +86,8 @@ def create_world() -> World:
                  0, 0, 0,
                  text("black", 'Wolf population: ' + str(500), 25, 200, 130),
                  text("black", 'Sheep population: ' + str(1000), 25, 200, 170),
-                 1000,500)
+                 1000,500,
+                 [rectangle('green',100 ,100, 0, 0)])
     #using the other way to make dataclass instance
 
 def increase_timers(world: World):
