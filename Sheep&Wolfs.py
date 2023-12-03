@@ -36,10 +36,30 @@ from designer import *
 from random import randint
 from dataclasses import dataclass
 
+#screen width: 800
+#screen height: 600
 WOLF_SPEED = 2
 SHEEP_SPEED = 1
 
-GRASS_RECTANGLES = [rectangle('green',0 ,0)]
+#List of the grass squares to be used on screen
+GRASS_ROW1 = [rectangle('green',get_width()/4, get_height()/3, 100, 100),
+                rectangle('green',get_width()/4, get_height()/3, 300, 100),
+                rectangle('green',get_width()/4, get_height()/3, 500, 100),
+                rectangle('green',get_width()/4, get_height()/3, 700, 100)]
+
+GRASS_ROW2 = [rectangle('green',get_width()/4, get_height()/3, 100, 300),
+                rectangle('green',get_width()/4, get_height()/3, 300, 300),
+                rectangle('green',get_width()/4, get_height()/3, 500, 300),
+                rectangle('green',get_width()/4, get_height()/3, 700, 300)]
+
+GRASS_ROW3 = [rectangle('green',get_width()/4, get_height()/3, 100, 500),
+                rectangle('green',get_width()/4, get_height()/3, 300, 500),
+                rectangle('green',get_width()/4, get_height()/3, 500, 500),
+                rectangle('green',get_width()/4, get_height()/3, 700, 500)]
+
+GRASS_RECTANGLES = [GRASS_ROW1, GRASS_ROW2, GRASS_ROW3] #2D array/list
+
+GRASS_GROWTH_TIMERS = [[0,0,0,0],[0,0,0,0],[0,0,0,0]]#for grass growing after being eaten
 
 @dataclass
 class Sheep:
@@ -59,7 +79,9 @@ class Wolf:
 
 @dataclass
 class World:
-    grass_squares: list[DesignerObject]#the grass on screen
+    grass_squares_grid: list[[DesignerObject]]#the grass on screen
+    grass_growth_timers: list[[int]]#timer for each grass square to grow back
+    
     
     sheep: list[Sheep]
     wolves: list[Wolf]
@@ -82,7 +104,7 @@ class World:
     
 def create_world() -> World:
     """Creates the World"""
-    return World([rectangle('green',100 ,100, 200, 200)],
+    return World(GRASS_RECTANGLES,GRASS_GROWTH_TIMERS,
                 [create_sheep()],[create_wolf()],
                  1000, 500,
                  0, 0, 0,
@@ -295,12 +317,32 @@ def population_increase_animals(world: World):
     world.sheep = filter_from_sheep(world.sheep, destroyed_sheep)
     destroyed_sheep = []
     
+def grass_dies(world: World):
+    """When a sheep touches green grass, it 'eats' the grass
+    and the grass turn brown for a period of time"""
+    grass_timers_grid = world.grass_growth_timers
+    start_timer_x = 0
+    start_timer_y = 0
+    for grass_square_row in world.grass_squares_grid:
+        start_timer_x += 1
+        start_timer_y = 0
+        for grass_square in grass_square_row:
+            start_timer_y += 1
+            for shep in world.sheep:
+                if grass_square.color == 'green' and colliding(grass_square, shep.emoji):
+                    grass_square.color = 'brown'
+                    #print(start_timer_x-1)
+                    #print(start_timer_y-1)
+                    world.grass_growth_timers[start_timer_x-1][start_timer_y-1] = 1
+                    
+                    
+
 def simulation_over(world: World): #THIS WILL BE THE LAST FUNCTION
     if world.wolf_population <= 0:
         pass
     if world.sheep_population <= 0:
         pass
-    
+
 
 when('starting', create_world)
 when('updating', increase_timers)
@@ -313,6 +355,8 @@ when('updating', animals_reproduce)
 when('updating', update_population_text)
 when('updating', wolf_eats_sheep)
 when('updating', population_increase_animals)
+when('updating', grass_dies)
 #there's a bug here, if you put 'updatin' it doesn't give an error
 
 start()
+
