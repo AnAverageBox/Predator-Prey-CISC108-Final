@@ -122,25 +122,25 @@ def increase_timers(world: World):
     for time_row in world.grass_growth_timers:
         row +=1
         #grass will grow back after 1000 updates
-        if time_row[0] > 0 and time_row[0] < 1000:
+        if time_row[0] > 0 and time_row[0] < 700:
             time_row[0] += 1
         else:
             time_row[0] = 0
             world.grass_squares_grid[row-1][0].color = 'green'
         
-        if time_row[1] > 0 and time_row[0] < 1000:
+        if time_row[1] > 0 and time_row[0] < 700:
             time_row[1] += 1
         else:
             time_row[1] = 0
             world.grass_squares_grid[row-1][1].color = 'green'
         
-        if time_row[2] > 0 and time_row[0] < 1000:
+        if time_row[2] > 0 and time_row[0] < 700:
             time_row[2] += 1
         else:
             time_row[2] = 0
             world.grass_squares_grid[row-1][2].color = 'green'
         
-        if time_row[3] > 0 and time_row[0] < 1000:
+        if time_row[3] > 0 and time_row[0] < 700:
             time_row[3] += 1
         else:
             time_row[3] = 0
@@ -290,7 +290,7 @@ def animals_die(world: World):
     if world.world_timer % 600 == 0:
         destroy(world.wolves[0].emoji)
         del world.wolves[0]#deletes oldest wolf in list of wolves
-        world.wolf_population -= 200
+        world.wolf_population -= 100
     if world.world_timer % 350 == 0:
         destroy(world.sheep[0].emoji)
         del world.sheep[0]#deletes oldest sheep in list of wolves
@@ -298,11 +298,11 @@ def animals_die(world: World):
         
 def wolves_starve(world: World):
     if world.wolf_population < 1000:
-        world.wolf_population -= .3
+        world.wolf_population -= .6
     if world.wolf_population > 1000 and world.wolf_population < 2000:
-        world.wolf_population -= .9
+        world.wolf_population -= 1.2
     if world.wolf_population >= 2000:
-        world.wolf_population -= 1.5
+        world.wolf_population -= 2.4
         
         
 def animals_reproduce(world: World):
@@ -360,7 +360,6 @@ def population_increase_animals(world: World):
         world.wolves.append(create_wolf())
         world.wolf_population_spawn = world.wolf_population
     elif world.wolf_population - world.wolf_population_spawn <= -200:
-        print(world.wolves)
         destroyed_wolves.append(world.wolves[0])
         world.wolf_population_spawn = world.wolf_population
         
@@ -374,7 +373,6 @@ def filter_from_wolves(old_list: list[Wolf], elements_to_not_keep: list[Wolf], w
         if wolf in elements_to_not_keep:
             destroy(wolf.emoji)
             del wolf
-            world.wolf_population -= 200
         else:
             wolves_left.append(wolf)
     return wolves_left
@@ -386,7 +384,6 @@ def filter_from_sheep(old_list: list[Sheep], elements_to_not_keep: list[Sheep], 
         if sheep in elements_to_not_keep:
             destroy(sheep.emoji)
             del sheep
-            world.sheep_population - 400
         else:
             sheep_left.append(sheep)
     return sheep_left
@@ -411,18 +408,15 @@ def grass_dies(world: World):
                     if grass_timers_grid[start_timer_x-1][start_timer_y-1] == 1:
                         world.sheep_population += 100
 
-def grass_grows(world: World):
-    """Grass grows back after being 'eating'"""
+def simulation_over(world: World) -> bool:
+    if world.wolf_population <= 0 or len(world.wolves) < 1:
+        return True
+            
+    elif world.sheep_population <= 0 or len(world.sheep) < 1:
+        return True
     
 
-def simulation_over(world: World): #THIS WILL BE THE LAST FUNCTION
-    if world.wolf_population <= 0:
-        pass
-    if world.sheep_population <= 0:
-        pass
 
-
-#100 updates is around 6 seconds
 when('starting', create_world)
 when('updating', increase_timers)
 when('updating', make_wolf)
@@ -436,6 +430,7 @@ when('updating', update_population_text)
 when('updating', wolf_eats_sheep)
 when('updating', population_increase_animals)
 when('updating', grass_dies)
+when(simulation_over, pause)
 #there's a bug here, if you put 'updatin' it doesn't give an error
 
 start()
