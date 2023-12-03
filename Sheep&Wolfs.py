@@ -19,11 +19,11 @@ Put an X into the [ ] boxes for each milestone you believe you have finished.
 [X] Animals reproduce
 # Milestone 3
 [X] Grass exists
-[ ] Grass lives
-[ ] Sheep eat
-[ ] Grass grows
-[ ] Green grass
-[ ] Show stats
+[X] Grass lives
+[X] Sheep eat
+[X] Grass grows
+[X] Green grass
+[X] Show stats
 # Extra Credit
 [ ] Stable Settings
 [ ] Fancy Stats
@@ -100,13 +100,11 @@ class World:
     sheep_population_spawn: float #population can affect on-screen animals
     wolf_population_spawn: float
     
-    
-    
 def create_world() -> World:
     """Creates the World"""
     return World(GRASS_RECTANGLES,GRASS_GROWTH_TIMERS,
-                [create_sheep()],[create_wolf()],
-                 1000, 500,
+                [create_sheep(),create_sheep()],[create_wolf(),create_wolf()],
+                 800, 400,
                  0, 0, 0,
                  text("black", 'Wolf population: ' + str(500), 25, 200, 130),
                  text("black", 'Sheep population: ' + str(1000), 25, 200, 170),
@@ -118,7 +116,36 @@ def increase_timers(world: World):
     world.wolf_timer = world.wolf_timer + 1
     world.sheep_timer = world.sheep_timer + 1
     world.world_timer += 1
-
+    
+    
+    row = 0
+    for time_row in world.grass_growth_timers:
+        row +=1
+        #grass will grow back after 1000 updates
+        if time_row[0] > 0 and time_row[0] < 1000:
+            time_row[0] += 1
+        else:
+            time_row[0] = 0
+            world.grass_squares_grid[row-1][0].color = 'green'
+        
+        if time_row[1] > 0 and time_row[0] < 1000:
+            time_row[1] += 1
+        else:
+            time_row[1] = 0
+            world.grass_squares_grid[row-1][1].color = 'green'
+        
+        if time_row[2] > 0 and time_row[0] < 1000:
+            time_row[2] += 1
+        else:
+            time_row[2] = 0
+            world.grass_squares_grid[row-1][2].color = 'green'
+        
+        if time_row[3] > 0 and time_row[0] < 1000:
+            time_row[3] += 1
+        else:
+            time_row[3] = 0
+            world.grass_squares_grid[row-1][3].color = 'green'
+      
 def create_sheep() -> Sheep:
     """Creates sheep"""
     sheep_x = randint(0, get_width()-20)
@@ -224,9 +251,9 @@ def wolf_eats_sheep(world:World):
                 destroyed_sheep.append(shep)
                 
     if len(destroyed_sheep) > 0:
-        world.sheep_population -= 150
-        world.wolf_population += 100
-    world.sheep = filter_from_sheep(world.sheep, destroyed_sheep)
+        world.sheep_population -= 200
+        world.wolf_population += 300
+    world.sheep = filter_from_sheep(world.sheep, destroyed_sheep, world)
     
 def new_animal_location(x: int, y: int) -> list[int]:
     """takes coordinate x and y, and return new coordinate that is
@@ -260,12 +287,23 @@ def new_animal_location(x: int, y: int) -> list[int]:
 
 def animals_die(world: World):
     """each sheep and wolf dies after a certain amount of time (likely to get changed after adding population)"""
-    if world.world_timer % 500 == 0:
+    if world.world_timer % 600 == 0:
         destroy(world.wolves[0].emoji)
         del world.wolves[0]#deletes oldest wolf in list of wolves
+        world.wolf_population -= 200
     if world.world_timer % 350 == 0:
         destroy(world.sheep[0].emoji)
         del world.sheep[0]#deletes oldest sheep in list of wolves
+        world.sheep_population -= 400
+        
+def wolves_starve(world: World):
+    if world.wolf_population < 1000:
+        world.wolf_population -= .3
+    if world.wolf_population > 1000 and world.wolf_population < 2000:
+        world.wolf_population -= .9
+    if world.wolf_population >= 2000:
+        world.wolf_population -= 1.5
+        
         
 def animals_reproduce(world: World):
     """animals' populations goes up and down, dependeing on the number of
@@ -307,15 +345,51 @@ def population_increase_animals(world: World):
     """adds or removes sheep/wolves from the screen depending on how much their
     population goes up or down"""
     destroyed_sheep = []
-    if world.sheep_population - world.sheep_population_spawn >= 150:
+    if world.sheep_population - world.sheep_population_spawn >= 400:
         world.sheep.append(create_sheep())
         world.sheep_population_spawn = world.sheep_population
-    elif world.sheep_population - world.sheep_population_spawn <= -150:
+    elif world.sheep_population - world.sheep_population_spawn <= -400:
         destroyed_sheep.append(world.sheep[0])
         world.sheep_population_spawn = world.sheep_population
         
-    world.sheep = filter_from_sheep(world.sheep, destroyed_sheep)
+    world.sheep = filter_from_sheep(world.sheep, destroyed_sheep, world)
     destroyed_sheep = []
+    
+    destroyed_wolves = []
+    if world.wolf_population - world.wolf_population_spawn >= 200:
+        world.wolves.append(create_wolf())
+        world.wolf_population_spawn = world.wolf_population
+    elif world.wolf_population - world.wolf_population_spawn <= -200:
+        print(world.wolves)
+        destroyed_wolves.append(world.wolves[0])
+        world.wolf_population_spawn = world.wolf_population
+        
+    world.wolves = filter_from_wolves(world.wolves, destroyed_wolves, world)
+    destroyed_wolves = []
+    
+def filter_from_wolves(old_list: list[Wolf], elements_to_not_keep: list[Wolf], world: World) -> list[Wolf]:
+    """deletes wolves from list of wolves that have died"""
+    wolves_left = []
+    for wolf in old_list:
+        if wolf in elements_to_not_keep:
+            destroy(wolf.emoji)
+            del wolf
+            world.wolf_population -= 200
+        else:
+            wolves_left.append(wolf)
+    return wolves_left
+
+def filter_from_sheep(old_list: list[Sheep], elements_to_not_keep: list[Sheep], world: World) -> list[Sheep]:
+    """filters out sheep that have been 'killed' by the wolf and deletes them from the world"""
+    sheep_left = []
+    for sheep in old_list:
+        if sheep in elements_to_not_keep:
+            destroy(sheep.emoji)
+            del sheep
+            world.sheep_population - 400
+        else:
+            sheep_left.append(sheep)
+    return sheep_left
     
 def grass_dies(world: World):
     """When a sheep touches green grass, it 'eats' the grass
@@ -323,19 +397,23 @@ def grass_dies(world: World):
     grass_timers_grid = world.grass_growth_timers
     start_timer_x = 0
     start_timer_y = 0
-    for grass_square_row in world.grass_squares_grid:
-        start_timer_x += 1
-        start_timer_y = 0
-        for grass_square in grass_square_row:
-            start_timer_y += 1
-            for shep in world.sheep:
+    
+    for shep in world.sheep:
+        start_timer_x = 0
+        for grass_square_row in world.grass_squares_grid:
+            start_timer_x += 1
+            start_timer_y = 0
+            for grass_square in grass_square_row:
+                start_timer_y += 1
                 if grass_square.color == 'green' and colliding(grass_square, shep.emoji):
-                    grass_square.color = 'brown'
-                    #print(start_timer_x-1)
-                    #print(start_timer_y-1)
-                    world.grass_growth_timers[start_timer_x-1][start_timer_y-1] = 1
-                    
-                    
+                    grass_square.color = 'saddlebrown'
+                    grass_timers_grid[start_timer_x-1][start_timer_y-1] += 1
+                    if grass_timers_grid[start_timer_x-1][start_timer_y-1] == 1:
+                        world.sheep_population += 100
+
+def grass_grows(world: World):
+    """Grass grows back after being 'eating'"""
+    
 
 def simulation_over(world: World): #THIS WILL BE THE LAST FUNCTION
     if world.wolf_population <= 0:
@@ -344,6 +422,7 @@ def simulation_over(world: World): #THIS WILL BE THE LAST FUNCTION
         pass
 
 
+#100 updates is around 6 seconds
 when('starting', create_world)
 when('updating', increase_timers)
 when('updating', make_wolf)
@@ -352,6 +431,7 @@ when('updating', move_wolves)
 when('updating', move_sheep)
 when('updating', animals_die)
 when('updating', animals_reproduce)
+when('updating', wolves_starve)
 when('updating', update_population_text)
 when('updating', wolf_eats_sheep)
 when('updating', population_increase_animals)
