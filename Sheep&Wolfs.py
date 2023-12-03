@@ -3,6 +3,8 @@ link to milestone 1 demo: https://drive.google.com/file/d/1iQFsoh4K1TU5lLgh_2xIy
 
 link to milestone 2 demo: https://drive.google.com/file/d/1u96U_DzSRpxA95U6sS-xi7c0vwGMWgcO/view?usp=sharing
 
+link to final submission demo: https://drive.google.com/file/d/1vJ6vSZsA047IeOHTUyLJb788VIYJlLCR/view?usp=drive_link
+
 Instructions: copy the text below into a comment at the top of your Python file.
 Put an X into the [ ] boxes for each milestone you believe you have finished.
 
@@ -106,9 +108,9 @@ def create_world() -> World:
                 [create_sheep(),create_sheep()],[create_wolf(),create_wolf()],
                  800, 400,
                  0, 0, 0,
-                 text("black", 'Wolf population: ' + str(500), 25, 200, 130),
-                 text("black", 'Sheep population: ' + str(1000), 25, 200, 170),
-                 1000,500,)
+                 text("black", 'Wolf population: ' + str(400), 25, 200, 130),
+                 text("black", 'Sheep population: ' + str(800), 25, 200, 170),
+                 800,400,)
     #using the other way to make dataclass instance
 
 def increase_timers(world: World):
@@ -185,7 +187,7 @@ def move_sheep(world: World):
 def make_sheep(world: World):
     """Creates sheep on a random part of the screen when conditions are met,
     uses create_sheep() function"""
-    if world.sheep_timer / 100 >= 1:
+    if world.sheep_timer / 200 >= 1:
         #every 50 updates another sheep will spawn on screen
         world.sheep.append(create_sheep())
         world.sheep_timer = 0
@@ -251,8 +253,8 @@ def wolf_eats_sheep(world:World):
                 destroyed_sheep.append(shep)
                 
     if len(destroyed_sheep) > 0:
-        world.sheep_population -= 200
-        world.wolf_population += 300
+        world.sheep_population -= 400
+        world.wolf_population += 200
     world.sheep = filter_from_sheep(world.sheep, destroyed_sheep, world)
     
 def new_animal_location(x: int, y: int) -> list[int]:
@@ -286,11 +288,11 @@ def new_animal_location(x: int, y: int) -> list[int]:
     return [new_x, new_y]
 
 def animals_die(world: World):
-    """each sheep and wolf dies after a certain amount of time (likely to get changed after adding population)"""
+    """each sheep and wolf dies after a certain amount of time (from age)"""
     if world.world_timer % 600 == 0:
         destroy(world.wolves[0].emoji)
         del world.wolves[0]#deletes oldest wolf in list of wolves
-        world.wolf_population -= 100
+        world.wolf_population -= 200
     if world.world_timer % 350 == 0:
         destroy(world.sheep[0].emoji)
         del world.sheep[0]#deletes oldest sheep in list of wolves
@@ -303,6 +305,8 @@ def wolves_starve(world: World):
         world.wolf_population -= 1.2
     if world.wolf_population >= 2000:
         world.wolf_population -= 2.4
+    else:
+        world.wolf_population -= world.wolf_population * 0.001
         
         
 def animals_reproduce(world: World):
@@ -329,19 +333,8 @@ def update_population_text(world:World):
     
     updated_wolf_text = 'Wolf population: ' + str(int(world.wolf_population))
     world.wolf_population_counter.text = updated_wolf_text   
-            
-def filter_from_sheep(old_list: list[Sheep], elements_to_not_keep: list[Sheep]) -> list[Sheep]:
-    """filters out sheep that have been 'killed' by the wolf and deletes them from the world"""
-    sheep_left = []
-    for sheep in old_list:
-        if sheep in elements_to_not_keep:
-            destroy(sheep.emoji)
-            del sheep
-        else:
-            sheep_left.append(sheep)
-    return sheep_left
 
-def population_increase_animals(world: World):
+def emoji_increase_decrease_on_population(world: World):
     """adds or removes sheep/wolves from the screen depending on how much their
     population goes up or down"""
     destroyed_sheep = []
@@ -410,9 +403,11 @@ def grass_dies(world: World):
 
 def simulation_over(world: World) -> bool:
     if world.wolf_population <= 0 or len(world.wolves) < 1:
+        world.wolf_population = 0
         return True
             
     elif world.sheep_population <= 0 or len(world.sheep) < 1:
+        world.sheep_population = 0 
         return True
     
 
@@ -428,9 +423,9 @@ when('updating', animals_reproduce)
 when('updating', wolves_starve)
 when('updating', update_population_text)
 when('updating', wolf_eats_sheep)
-when('updating', population_increase_animals)
+when('updating', emoji_increase_decrease_on_population)
 when('updating', grass_dies)
-when(simulation_over, pause)
+when(simulation_over,update_population_text, pause)
 #there's a bug here, if you put 'updatin' it doesn't give an error
 
 start()
