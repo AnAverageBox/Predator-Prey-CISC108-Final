@@ -1,9 +1,5 @@
 '''
-link to milestone 1 demo: https://drive.google.com/file/d/1iQFsoh4K1TU5lLgh_2xIyjmcAowIe2Jl/view?usp=sharing
-
-link to milestone 2 demo: https://drive.google.com/file/d/1u96U_DzSRpxA95U6sS-xi7c0vwGMWgcO/view?usp=sharing
-
-link to final submission demo: https://drive.google.com/file/d/1vJ6vSZsA047IeOHTUyLJb788VIYJlLCR/view?usp=drive_link
+link to final submission demo: https://drive.google.com/file/d/1RxpBRkw8PAqhmHTUvnWf7i8DQht96elm/view?usp=drive_link
 
 Instructions: copy the text below into a comment at the top of your Python file.
 Put an X into the [ ] boxes for each milestone you believe you have finished.
